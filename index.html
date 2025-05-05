@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Yarraville Tennis Club Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 1000px; margin: auto; }
+    .grid { overflow-x: auto; border: 1px solid #ccc; border-radius: 5px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background: #f0f0f0; }
+    .booked { background-color: #ffdddd; }
+    .blocked { background-color: #ddd; }
+    .available { background-color: #eaffea; }
+  </style>
+</head>
+<body>
+<h1>Yarraville Tennis Club</h1>
+<h3>Book a court for {{ date_str }}</h3>
+<div class="grid">
+  <table>
+    <thead>
+      <tr>
+        <th>Hour</th>
+        {% for court in courts %}
+          <th>Court {{ court }}<br>({{ courts[court] }})</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for hour in hours %}
+        <tr>
+          <td>{{ hour }}:00</td>
+          {% for court in courts %}
+            {% set key = 'court_' ~ court ~ '_hour_' ~ hour %}
+            <td>
+            {% if key in bookings %}
+              {{ bookings[key] }}
+              <form method="post" style="margin:0">
+                <input type="hidden" name="court" value="{{ court }}">
+                <input type="hidden" name="hour" value="{{ hour }}">
+                <input type="hidden" name="cancel" value="1">
+                <button type="submit">Cancel</button>
+              </form>
+            {% elif is_blocked(date_str, court, hour) %}
+              Blocked
+            {% else %}
+              Available
+            {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<form method="post">
+  <label>Name:<input type="text" name="name" required></label><br>
+  <label>Court:<select name="court">
+    {% for court in courts %}
+      <option value="{{ court }}">Court {{ court }}</option>
+    {% endfor %}
+  </select></label><br>
+  <label>Hour:<select name="hour">
+    {% for hour in hours %}
+      <option value="{{ hour }}">{{ hour }}:00</option>
+    {% endfor %}
+  </select></label><br>
+  <button type="submit">Book</button>
+</form>
+</body>
+</html>
