@@ -1,1 +1,5 @@
 flask
+flask-login
+flask-mail
+email-validator
+werkzeug
